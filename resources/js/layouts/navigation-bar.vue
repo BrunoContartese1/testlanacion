@@ -2,7 +2,7 @@
     <div>
         <v-app-bar app clipped-left>
             <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-            <v-toolbar-title>CodeSolutions</v-toolbar-title>
+            <v-toolbar-title>Test La Nación</v-toolbar-title>
         </v-app-bar>
 
         <v-navigation-drawer v-model="drawer" app clipped>
@@ -66,10 +66,11 @@ export default {
     data: () => ({
         items: [
           { title: 'Principal', icon: 'mdi-view-dashboard', to:"/" },
+          { title: 'Sensores', icon: 'mdi-google-maps', to:"/Administration/Sensors" },
       ],
       administration: [
           { title: 'Usuarios', icon: 'mdi-badge-account', to:"/administration/users" },
-          { title: 'Perfiles', icon: 'mdi-tune', to:"/Administration/Profiles" },
+          { title: 'Perfiles', icon: 'mdi-lock', to:"/Administration/Profiles" },
       ],
       drawer: null
     })

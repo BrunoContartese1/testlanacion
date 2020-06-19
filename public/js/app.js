@@ -1978,6 +1978,10 @@ __webpack_require__.r(__webpack_exports__);
         title: 'Principal',
         icon: 'mdi-view-dashboard',
         to: "/"
+      }, {
+        title: 'Sensores',
+        icon: 'mdi-google-maps',
+        to: "/Administration/Sensors"
       }],
       administration: [{
         title: 'Usuarios',
@@ -1985,7 +1989,7 @@ __webpack_require__.r(__webpack_exports__);
         to: "/administration/users"
       }, {
         title: 'Perfiles',
-        icon: 'mdi-tune',
+        icon: 'mdi-lock',
         to: "/Administration/Profiles"
       }],
       drawer: null
@@ -2084,9 +2088,6 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-//
-//
-//
 //
 //
 //
@@ -2579,6 +2580,416 @@ __webpack_require__.r(__webpack_exports__);
           this.updatePermissions();
         }
       }
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['selectedSensor'],
+  mounted: function mounted() {
+    this.sensor = this.selectedSensor;
+  },
+  data: function data() {
+    return {
+      dialog: true,
+      sensor: {}
+    };
+  },
+  methods: {
+    closeDialog: function closeDialog() {
+      this.$emit("close-dialog");
+    },
+    updateSensor: function updateSensor() {
+      this.$emit('update-sensor', this.sensor);
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/index.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/administration/sensors/index.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  mounted: function mounted() {
+    this.getSensors();
+  },
+  data: function data() {
+    return {
+      isLoading: true,
+      newDialog: false,
+      updateDialog: false,
+      sensors: {},
+      selectedSensor: {},
+      lastPage: 1,
+      currentPage: 1
+    };
+  },
+  methods: {
+    getSensors: function getSensors() {
+      var me = this;
+      axios.get('/api/Administration/sensors?page=' + me.currentPage, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem('access_token')
+        }
+      }).then(function (response) {
+        me.sensors = response.data.data;
+        me.lastPage = response.data.last_page;
+
+        if (me.currentPage > me.lastPage) {
+          me.currentPage = me.lastPage;
+        }
+      })["catch"](function (res) {
+        switch (res.response.status) {
+          case 422:
+            me.$handleErrors(res.response.data.errors);
+            break;
+
+          case 404:
+            me.message('error', 'Oops! Ha ocurrido un error de sistema. (404)');
+            break;
+
+          case 401:
+            me.message('error', 'Usted no está autorizado a ver los sensores.');
+            break;
+
+          default:
+            me.message('error', 'Oops! Ha ocurrido un error de sistema. (' + res.response.status + ')');
+            break;
+        }
+      })["finally"](function () {
+        me.isLoading = false;
+      });
+    },
+    message: function message(className, _message) {
+      Vue.toasted.show(_message, {
+        className: className,
+        position: 'top-right',
+        duration: 5000
+      });
+    },
+    askForDelete: function askForDelete(sensor) {
+      var me = this;
+      var options = {
+        okText: 'Aceptar',
+        cancelText: 'Cancelar',
+        animation: 'zoom',
+        clicksCount: 2
+      };
+      this.$dialog.confirm('¿Está seguro de que desea eliminar el sensor?', options).then(function (dialog) {
+        me.deleteSensor(sensor.id);
+      })["catch"](function () {
+        console.log("No confirmado");
+      });
+    },
+    deleteSensor: function deleteSensor(sensorId) {
+      var me = this;
+      me.isLoading = true;
+      axios["delete"]('/api/Administration/sensors/' + sensorId, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem('access_token')
+        }
+      }).then(function () {
+        me.getSensors();
+        me.message('success', 'Sensor eliminado con éxito!');
+      })["catch"](function (res) {
+        me.isLoading = false;
+
+        switch (res.response.status) {
+          case 422:
+            me.$handleErrors(res.response.data.errors);
+            break;
+
+          case 404:
+            me.message('error', 'Oops! Ha ocurrido un error al crear el sensor.');
+            break;
+
+          case 401:
+            me.message('error', 'Usted no está autorizado a eliminar sensores.');
+            break;
+
+          default:
+            me.message('error', 'Oops! Ha ocurrido un error al crear el sensor.');
+            break;
+        }
+      });
+    },
+    createSensor: function createSensor(sensor) {
+      var me = this;
+      this.isLoading = true;
+      axios.post('/api/Administration/sensors', {
+        name: sensor.name,
+        x_pos: sensor.x_pos,
+        y_pos: sensor.y_pos
+      }, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem('access_token')
+        }
+      }).then(function (response) {
+        me.message('success', 'Sensor creado con éxito');
+        me.getSensors();
+        me.newDialog = false;
+      })["catch"](function (res) {
+        switch (res.response.status) {
+          case 422:
+            me.$handleErrors(res.response.data.errors);
+            break;
+
+          case 404:
+            me.message('error', 'Oops! Ha ocurrido un error de sistema. (404)');
+            break;
+
+          case 401:
+            me.message('error', 'Usted no está autorizado a crear sensores.');
+            break;
+
+          default:
+            me.message('error', 'Oops! Ha ocurrido un error de sistema. (' + res.response.status + ')');
+            break;
+        }
+      })["finally"](function () {
+        me.isLoading = false;
+      });
+    },
+    editSensor: function editSensor(sensor) {
+      this.selectedSensor = sensor;
+      this.updateDialog = true;
+    },
+    updateSensor: function updateSensor(sensor) {
+      var me = this;
+      this.isLoading = true;
+      axios.put('/api/Administration/sensors/' + sensor.id, {
+        name: sensor.name,
+        x_pos: sensor.x_pos,
+        y_pos: sensor.y_pos
+      }, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem('access_token')
+        }
+      }).then(function (response) {
+        me.message('success', 'Sensor actualizado con éxito');
+        me.getSensors();
+        me.updateDialog = false;
+      })["catch"](function (res) {
+        switch (res.response.status) {
+          case 422:
+            me.$handleErrors(res.response.data.errors);
+            break;
+
+          case 404:
+            me.message('error', 'Oops! Ha ocurrido un error de sistema. (404)');
+            break;
+
+          case 401:
+            me.message('error', 'Usted no está autorizado a actualizar sensores.');
+            break;
+
+          default:
+            me.message('error', 'Oops! Ha ocurrido un error de sistema. (' + res.response.status + ')');
+            break;
+        }
+      })["finally"](function () {
+        me.isLoading = false;
+      });
+    }
+  },
+  watch: {
+    currentPage: function currentPage(val) {
+      this.isLoading = true;
+      this.getSensors();
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      dialog: true,
+      sensor: {
+        name: "Sensor NN",
+        x_pos: "",
+        y_pos: ""
+      }
+    };
+  },
+  methods: {
+    closeDialog: function closeDialog() {
+      this.$emit("close-dialog");
+    },
+    createSensor: function createSensor() {
+      this.$emit('create-sensor', this.sensor);
     }
   }
 });
@@ -60353,7 +60764,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("v-footer", { attrs: { app: "" } }, [
-    _c("span", [_vm._v(" Code Solutions - ©2020")])
+    _c("span", [_vm._v(" Bruno Contartese - ©2020")])
   ])
 }
 var staticRenderFns = []
@@ -60394,7 +60805,7 @@ var render = function() {
             }
           }),
           _vm._v(" "),
-          _c("v-toolbar-title", [_vm._v("CodeSolutions")])
+          _c("v-toolbar-title", [_vm._v("Test La Nación")])
         ],
         1
       ),
@@ -61060,6 +61471,602 @@ var render = function() {
         ],
         1
       )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=template&id=907b48f8&":
+/*!*************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=template&id=907b48f8& ***!
+  \*************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c(
+        "v-row",
+        { attrs: { justify: "center" } },
+        [
+          _c(
+            "v-dialog",
+            {
+              attrs: { dark: true, persistent: "", "max-width": "600px" },
+              model: {
+                value: _vm.dialog,
+                callback: function($$v) {
+                  _vm.dialog = $$v
+                },
+                expression: "dialog"
+              }
+            },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", [
+                    _c("span", { staticClass: "headline" }, [
+                      _vm._v("Editar sensor")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c(
+                        "v-container",
+                        [
+                          _c(
+                            "v-row",
+                            [
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: { label: "Nombre del sensor *" },
+                                    model: {
+                                      value: _vm.sensor.name,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.sensor, "name", $$v)
+                                      },
+                                      expression: "sensor.name"
+                                    }
+                                  })
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: {
+                                      label: "Posición X ( Unidades ) *",
+                                      required: ""
+                                    },
+                                    model: {
+                                      value: _vm.sensor.x_pos,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.sensor, "x_pos", $$v)
+                                      },
+                                      expression: "sensor.x_pos"
+                                    }
+                                  })
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: {
+                                      label: "Posición Y ( Unidades ) *",
+                                      required: ""
+                                    },
+                                    model: {
+                                      value: _vm.sensor.y_pos,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.sensor, "y_pos", $$v)
+                                      },
+                                      expression: "sensor.y_pos"
+                                    }
+                                  })
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c("v-spacer"),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { color: "success" },
+                          on: {
+                            click: function($event) {
+                              return _vm.closeDialog()
+                            }
+                          }
+                        },
+                        [_vm._v("Cancelar")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { color: "warning" },
+                          on: {
+                            click: function($event) {
+                              return _vm.updateSensor()
+                            }
+                          }
+                        },
+                        [_vm._v("Actualizar")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/index.vue?vue&type=template&id=2063576c&":
+/*!**************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/administration/sensors/index.vue?vue&type=template&id=2063576c& ***!
+  \**************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c(
+        "v-overlay",
+        { attrs: { value: _vm.isLoading } },
+        [
+          _c("v-progress-circular", {
+            attrs: { indeterminate: "", size: "64" }
+          })
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-row",
+        { attrs: { "auto-grow": "" } },
+        [
+          _c(
+            "v-col",
+            { attrs: { cols: "12" } },
+            [
+              _c(
+                "v-card",
+                { attrs: { outlined: "" } },
+                [
+                  _c(
+                    "v-toolbar",
+                    { attrs: { flat: "" } },
+                    [
+                      _c("v-toolbar-title", { staticClass: "grey--text" }, [
+                        _vm._v("Listado de sensores")
+                      ]),
+                      _vm._v(" "),
+                      _c("v-spacer"),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { color: "primary" },
+                              on: {
+                                click: function($event) {
+                                  _vm.newDialog = true
+                                }
+                              }
+                            },
+                            [_c("v-icon", [_vm._v("mdi-plus")])],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _vm._l(_vm.sensors, function(sensor) {
+                        return [
+                          _c(
+                            "v-row",
+                            { key: sensor.id },
+                            [
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c(
+                                    "v-container",
+                                    [
+                                      _c(
+                                        "v-card",
+                                        {
+                                          attrs: { raised: "", elevation: "24" }
+                                        },
+                                        [
+                                          _c("v-card-title", [
+                                            _vm._v(_vm._s(sensor.name))
+                                          ]),
+                                          _vm._v(" "),
+                                          _c(
+                                            "v-card-text",
+                                            [
+                                              _c(
+                                                "v-row",
+                                                [
+                                                  _c("v-col", [
+                                                    _c("p", [
+                                                      _c("strong", [
+                                                        _vm._v(
+                                                          "Posición X: " +
+                                                            _vm._s(sensor.x_pos)
+                                                        )
+                                                      ])
+                                                    ]),
+                                                    _vm._v(" "),
+                                                    _c("p", [
+                                                      _c("strong", [
+                                                        _vm._v(
+                                                          "Posición Y: " +
+                                                            _vm._s(sensor.y_pos)
+                                                        )
+                                                      ])
+                                                    ])
+                                                  ])
+                                                ],
+                                                1
+                                              )
+                                            ],
+                                            1
+                                          ),
+                                          _vm._v(" "),
+                                          _c(
+                                            "v-card-actions",
+                                            [
+                                              _c("v-spacer"),
+                                              _vm._v(" "),
+                                              _c(
+                                                "v-btn",
+                                                {
+                                                  attrs: { color: "#dc3545" },
+                                                  on: {
+                                                    click: function($event) {
+                                                      return _vm.askForDelete(
+                                                        sensor
+                                                      )
+                                                    }
+                                                  }
+                                                },
+                                                [
+                                                  _c(
+                                                    "strong",
+                                                    { staticClass: "text-" },
+                                                    [_vm._v("Eliminar Sensor")]
+                                                  )
+                                                ]
+                                              ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "v-btn",
+                                                {
+                                                  staticClass: "warning",
+                                                  on: {
+                                                    click: function($event) {
+                                                      return _vm.editSensor(
+                                                        sensor
+                                                      )
+                                                    }
+                                                  }
+                                                },
+                                                [_vm._v("Editar Sensor")]
+                                              )
+                                            ],
+                                            1
+                                          )
+                                        ],
+                                        1
+                                      )
+                                    ],
+                                    1
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ]
+                      })
+                    ],
+                    2
+                  ),
+                  _vm._v(" "),
+                  _c("v-pagination", {
+                    attrs: { length: _vm.lastPage },
+                    model: {
+                      value: _vm.currentPage,
+                      callback: function($$v) {
+                        _vm.currentPage = $$v
+                      },
+                      expression: "currentPage"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _vm.newDialog
+                    ? _c("new-sensor-dialog", {
+                        on: {
+                          "close-dialog": function($event) {
+                            _vm.newDialog = false
+                          },
+                          "create-sensor": _vm.createSensor
+                        }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.updateDialog
+                    ? _c("edit-sensor-dialog", {
+                        attrs: { selectedSensor: _vm.selectedSensor },
+                        on: {
+                          "close-dialog": function($event) {
+                            _vm.updateDialog = false
+                          },
+                          "update-sensor": _vm.updateSensor
+                        }
+                      })
+                    : _vm._e()
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=template&id=4637ba4c&":
+/*!************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=template&id=4637ba4c& ***!
+  \************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c(
+        "v-row",
+        { attrs: { justify: "center" } },
+        [
+          _c(
+            "v-dialog",
+            {
+              attrs: { dark: true, persistent: "", "max-width": "600px" },
+              model: {
+                value: _vm.dialog,
+                callback: function($$v) {
+                  _vm.dialog = $$v
+                },
+                expression: "dialog"
+              }
+            },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", [
+                    _c("span", { staticClass: "headline" }, [
+                      _vm._v("Nuevo sensor")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c(
+                        "v-container",
+                        [
+                          _c(
+                            "v-row",
+                            [
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: { label: "Nombre del sensor *" },
+                                    model: {
+                                      value: _vm.sensor.name,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.sensor, "name", $$v)
+                                      },
+                                      expression: "sensor.name"
+                                    }
+                                  })
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: {
+                                      label: "Posición X ( Unidades ) *",
+                                      required: ""
+                                    },
+                                    model: {
+                                      value: _vm.sensor.x_pos,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.sensor, "x_pos", $$v)
+                                      },
+                                      expression: "sensor.x_pos"
+                                    }
+                                  })
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: {
+                                      label: "Posición Y ( Unidades ) *",
+                                      required: ""
+                                    },
+                                    model: {
+                                      value: _vm.sensor.y_pos,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.sensor, "y_pos", $$v)
+                                      },
+                                      expression: "sensor.y_pos"
+                                    }
+                                  })
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c("v-spacer"),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { color: "success" },
+                          on: {
+                            click: function($event) {
+                              return _vm.closeDialog()
+                            }
+                          }
+                        },
+                        [_vm._v("Cancelar")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { color: "warning" },
+                          on: {
+                            click: function($event) {
+                              return _vm.createSensor()
+                            }
+                          }
+                        },
+                        [_vm._v("Crear")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -61792,7 +62799,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Principal")])
+  return _c("div")
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -120026,6 +121033,9 @@ var map = {
 	"./views/App.vue": "./resources/js/views/App.vue",
 	"./views/administration/profiles/index.vue": "./resources/js/views/administration/profiles/index.vue",
 	"./views/administration/profiles/permissions.vue": "./resources/js/views/administration/profiles/permissions.vue",
+	"./views/administration/sensors/editSensorDialog.vue": "./resources/js/views/administration/sensors/editSensorDialog.vue",
+	"./views/administration/sensors/index.vue": "./resources/js/views/administration/sensors/index.vue",
+	"./views/administration/sensors/newSensorDialog.vue": "./resources/js/views/administration/sensors/newSensorDialog.vue",
 	"./views/administration/users/editUserDialog.vue": "./resources/js/views/administration/users/editUserDialog.vue",
 	"./views/administration/users/index.vue": "./resources/js/views/administration/users/index.vue",
 	"./views/auth/login.vue": "./resources/js/views/auth/login.vue",
@@ -120437,7 +121447,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _js_views_administration_profiles_index__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/js/views/administration/profiles/index */ "./resources/js/views/administration/profiles/index.vue");
 /* harmony import */ var _js_views_administration_profiles_permissions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/js/views/administration/profiles/permissions */ "./resources/js/views/administration/profiles/permissions.vue");
 /* harmony import */ var _js_views_administration_users_index__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/js/views/administration/users/index */ "./resources/js/views/administration/users/index.vue");
-/* harmony import */ var _js_views_errors_notFound__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/js/views/errors/notFound */ "./resources/js/views/errors/notFound.vue");
+/* harmony import */ var _js_views_administration_sensors_index__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/js/views/administration/sensors/index */ "./resources/js/views/administration/sensors/index.vue");
+/* harmony import */ var _js_views_errors_notFound__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/js/views/errors/notFound */ "./resources/js/views/errors/notFound.vue");
 
 
 /*Pages*/
@@ -120461,6 +121472,11 @@ __webpack_require__.r(__webpack_exports__);
 
 /*===================================================
                     Users
+====================================================*/
+
+
+/*===================================================
+                    Sensors
 ====================================================*/
 
 
@@ -120527,10 +121543,25 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
   /*========================================================
                           /Users
   /*======================================================*/
+
+  /*========================================================
+                          Sensors
+  /*======================================================*/
+  {
+    path: '/Administration/Sensors',
+    name: 'Sensors',
+    component: _js_views_administration_sensors_index__WEBPACK_IMPORTED_MODULE_8__["default"],
+    meta: {
+      requiresAuth: true
+    }
+  },
+  /*========================================================
+                          /Sensors
+  /*======================================================*/
   {
     path: '/404',
     name: '404',
-    component: _js_views_errors_notFound__WEBPACK_IMPORTED_MODULE_8__["default"]
+    component: _js_views_errors_notFound__WEBPACK_IMPORTED_MODULE_9__["default"]
   }, {
     path: '*',
     redirect: '/404'
@@ -120818,6 +121849,213 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_permissions_vue_vue_type_template_id_36351bc1___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_permissions_vue_vue_type_template_id_36351bc1___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/editSensorDialog.vue":
+/*!************************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/editSensorDialog.vue ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _editSensorDialog_vue_vue_type_template_id_907b48f8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./editSensorDialog.vue?vue&type=template&id=907b48f8& */ "./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=template&id=907b48f8&");
+/* harmony import */ var _editSensorDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./editSensorDialog.vue?vue&type=script&lang=js& */ "./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _editSensorDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _editSensorDialog_vue_vue_type_template_id_907b48f8___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _editSensorDialog_vue_vue_type_template_id_907b48f8___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/views/administration/sensors/editSensorDialog.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_editSensorDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./editSensorDialog.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_editSensorDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=template&id=907b48f8&":
+/*!*******************************************************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=template&id=907b48f8& ***!
+  \*******************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_editSensorDialog_vue_vue_type_template_id_907b48f8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./editSensorDialog.vue?vue&type=template&id=907b48f8& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/editSensorDialog.vue?vue&type=template&id=907b48f8&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_editSensorDialog_vue_vue_type_template_id_907b48f8___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_editSensorDialog_vue_vue_type_template_id_907b48f8___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/index.vue":
+/*!*************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/index.vue ***!
+  \*************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _index_vue_vue_type_template_id_2063576c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.vue?vue&type=template&id=2063576c& */ "./resources/js/views/administration/sensors/index.vue?vue&type=template&id=2063576c&");
+/* harmony import */ var _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.vue?vue&type=script&lang=js& */ "./resources/js/views/administration/sensors/index.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _index_vue_vue_type_template_id_2063576c___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _index_vue_vue_type_template_id_2063576c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/views/administration/sensors/index.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/index.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/index.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/index.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/index.vue?vue&type=template&id=2063576c&":
+/*!********************************************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/index.vue?vue&type=template&id=2063576c& ***!
+  \********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_2063576c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=template&id=2063576c& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/index.vue?vue&type=template&id=2063576c&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_2063576c___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_2063576c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/newSensorDialog.vue":
+/*!***********************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/newSensorDialog.vue ***!
+  \***********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _newSensorDialog_vue_vue_type_template_id_4637ba4c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./newSensorDialog.vue?vue&type=template&id=4637ba4c& */ "./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=template&id=4637ba4c&");
+/* harmony import */ var _newSensorDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./newSensorDialog.vue?vue&type=script&lang=js& */ "./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _newSensorDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _newSensorDialog_vue_vue_type_template_id_4637ba4c___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _newSensorDialog_vue_vue_type_template_id_4637ba4c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/views/administration/sensors/newSensorDialog.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=script&lang=js&":
+/*!************************************************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_newSensorDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./newSensorDialog.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_newSensorDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=template&id=4637ba4c&":
+/*!******************************************************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=template&id=4637ba4c& ***!
+  \******************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_newSensorDialog_vue_vue_type_template_id_4637ba4c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./newSensorDialog.vue?vue&type=template&id=4637ba4c& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/newSensorDialog.vue?vue&type=template&id=4637ba4c&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_newSensorDialog_vue_vue_type_template_id_4637ba4c___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_newSensorDialog_vue_vue_type_template_id_4637ba4c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -121239,8 +122477,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/vagrant/code/vuestock/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/vagrant/code/vuestock/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /home/vagrant/code/testlanacion/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /home/vagrant/code/testlanacion/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

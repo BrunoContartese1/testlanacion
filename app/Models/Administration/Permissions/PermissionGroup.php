@@ -7,9 +7,9 @@ use Spatie\Permission\Models\Permission;
 
 class PermissionGroup extends Model
 {
-    public $table = 'permissions_group';
+    protected $table = 'permissions_group';
 
-    public $fillable = [
+    protected $fillable = [
         'name'
     ];
 

@@ -28,4 +28,5 @@ mix.js('resources/js/app.js', 'public/js')
         'public/assets/vendor/vuetify/vuetify.min.css',
         'public/assets/vendor/vuetify/vuetifyFonts.css',
         'public/assets/vendor/bulmaThemes/darkly.min.css',
+        'public/css/custom.css',
     ],'public/css/all.css');

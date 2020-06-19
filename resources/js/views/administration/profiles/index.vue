@@ -1,7 +1,4 @@
 <template>
-
-
-
     <v-layout justify-center v-if="isLoading">
         <v-progress-circular indeterminate></v-progress-circular>
     </v-layout>

@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
          $this->call(DashboardPermissionsSeeder::class);
          $this->call(UsersPermissionsSeeder::class);
          $this->call(ProfilesPermissionsSeeder::class);
+         $this->call(SensorsPermissionsSeeder::class);
 
          $this->call(UsersTableSeeder::class);
     }

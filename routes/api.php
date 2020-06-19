@@ -30,7 +30,7 @@ Route::group(['middleware' => 'auth:api'], function() {
     Route::prefix('Administration')->group(function() {
 
         /*=======================================================
-                            Profiles
+                            Profiles Routes
         ========================================================*/
         Route::resource('Profiles', 'Administration\Profiles\ProfilesController')->except(['create', 'edit']);
         Route::post('Profiles/Search', 'Administration\Profiles\ProfilesController@search');
@@ -38,23 +38,30 @@ Route::group(['middleware' => 'auth:api'], function() {
         Route::post('profiles/{profile}/updatePermissions', 'Administration\Profiles\ProfilesController@updatePermissions');
 
         /*=======================================================
-                            End Profiles
+                            End Profiles Routes
         ========================================================*/
 
 
         /*=======================================================
-                            Usuarios
+                            Users Routes
         ========================================================*/
         Route::resource('users', 'Administration\Users\UsersController')->except(['create', 'edit']);
 
 
         /*=======================================================
-                            Fin Usuarios
+                            End Users Routes
         ========================================================*/
 
+        /*=======================================================
+                            Sensors Routes
+        ========================================================*/
+        Route::resource('sensors', 'Administration\SensorsController')->except(['create', 'edit']);
 
 
-    });
+        /*=======================================================
+                            End Sensors Routes
+        ========================================================*/
+     });
 
 });
 

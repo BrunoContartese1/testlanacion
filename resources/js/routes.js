@@ -25,6 +25,11 @@ import profilePermissions from '@/js/views/administration/profiles/permissions';
 import Users from '@/js/views/administration/users/index';
 
 /*===================================================
+                    Sensors
+====================================================*/
+import Sensors from '@/js/views/administration/sensors/index';
+
+/*===================================================
                     Errors
 ====================================================*/
 import NotFound from '@/js/views/errors/notFound';
@@ -95,6 +100,23 @@ const router = new VueRouter({
         /*========================================================
                                 /Users
         /*======================================================*/
+
+        /*========================================================
+                                Sensors
+        /*======================================================*/
+        {
+            path: '/Administration/Sensors',
+            name: 'Sensors',
+            component: Sensors,
+            meta: {
+                requiresAuth: true,
+            }
+        },
+
+        /*========================================================
+                                /Sensors
+        /*======================================================*/
+
         {
             path: '/404',
             name: '404',
