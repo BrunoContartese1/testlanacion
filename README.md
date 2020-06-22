@@ -14,7 +14,16 @@ Descargar los archivos del repositorio o correr el siguiente comando
 
 > git clone https://github.com/BrunoContartese1/testlanacion.git
 
-Copiar el archivo .env.example y modificarlo con los datos de acceso a la base de datos.
+Copiar el archivo .env.example y modificar las siguientes líneas
+
+APP_URL=http://localhost <-- URL donde correrá la aplicación. Es importante que la coloque bien ya que la ruta de autenticación depende de esta línea.
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1 <-- IP de su base de datos
+DB_PORT=3306 <-- Puerto
+DB_DATABASE=laravel <-- Nombre de su base de datos
+DB_USERNAME=root <-- Usuario 
+DB_PASSWORD= <-- Contraseña
 
 Correr los siguientes comandos
 > composer install
@@ -22,6 +31,8 @@ Correr los siguientes comandos
 > npm install
 
 > npm run prod
+
+> php artisan key:generate
 
 Una vez hecho los pasos anteriores correr el siguiente comando
 > php artisan migrate --seed
