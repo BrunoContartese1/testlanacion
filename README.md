@@ -12,3 +12,22 @@ En esta aplicación utilice el framework laravel como fue requerido, utilizando 
 Descargar los archivos del repositorio o correr el siguiente comando
 
 > git clone https://github.com/BrunoContartese1/testlanacion.git
+
+Copiar el archivo .env.example y modificarlo con los datos de acceso a la base de datos.
+
+Correr los siguientes comandos
+> composer install
+> npm install
+> npm run prod
+
+Una vez hecho los pasos anteriores correr el siguiente comando
+> php artisan migrate --seed
+
+Luego
+
+>php artisan passport:install
+
+Este último comando nos dará la key para poder configurar Laravel passport y poder asi autenticarnos en la API.
+Se debe copiar el CLIENT SECRET del CLIENT ID Nº 2 (password grant client) en el archivo .env en la lnea que dice "PASSPORT_CLIENT_SECRET"
+
+La línea debera quedar algo parecido a <b>PASSPORT_CLIENT_SECRET=ivcwDbdVmhD6CFHQ7SgOZSL4D2DXbFdTebkjpp9E</b>
