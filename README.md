@@ -7,6 +7,8 @@ No se dieron pautas de diseño.
 
 En esta aplicación utilice el framework laravel como fue requerido, utilizando VUE para el front end, y laravel passport para la autenticación de la API. También se utilizaron varios paquetes no relevantes.
 
-#Inicialización del proyecto
+<h2>Inicialización del proyecto</h2>
+
 Descargar los archivos del repositorio o correr el siguiente comando
+
 > git clone https://github.com/BrunoContartese1/testlanacion.git
