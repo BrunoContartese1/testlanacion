@@ -17,7 +17,9 @@ Copiar el archivo .env.example y modificarlo con los datos de acceso a la base d
 
 Correr los siguientes comandos
 > composer install
+
 > npm install
+
 > npm run prod
 
 Una vez hecho los pasos anteriores correr el siguiente comando
