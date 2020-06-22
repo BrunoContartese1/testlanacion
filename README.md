@@ -1,4 +1,5 @@
 <h1>Aplicación de test RR HH La Nación.</h1>
+<h2>Demo del proyecto: <a href="https://sensores.codesolutions.com.ar" target="_blank">Aplicación de test</a> Usuario: demo  - Contraseña: demo </h2>
 Esta aplicación fue creada con el fin de cumplir con el ejercicio de programación requerido por el departamento de RR. HH del grupo La Nación. 
 La aplicación consiste en implementar en PHP utilizando el framework LARAVEL los endpoints necesarios para realizar un ABM de sensores, los cuáles tienen una posición en un plano en R2 (una mesa). Cada punto por ende, tendrá una coordenada (x;y).
 También se pide obtener los puntos más cercanos a otro.
