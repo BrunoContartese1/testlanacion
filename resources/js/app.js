@@ -57,6 +57,16 @@ Vue.filter('formatDate', function(value) {
         return moment(String(value)).format('DD/MM/YYYY hh:mm');
     }
 });
+
+/*Decimales*/
+Vue.filter('round', function(value) {
+    if(!value) {
+      value = 0;
+    }
+  
+    value = Math.round(value * Math.pow(10, 2)) / Math.pow(10, 2);
+    return value;
+  });
 /*========================================================
                     Fin Filtros
 /*======================================================*/

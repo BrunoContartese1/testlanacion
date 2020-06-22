@@ -4,7 +4,7 @@ namespace App\Http\Resources\Administration\Profiles;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class ProfileCollection extends ResourceCollection
+class ProfilesCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -14,9 +14,6 @@ class ProfileCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        return [
-            'data' => $this->collection,
-            'lastPage' => method_exists($this, 'lastPage') ? $this->lastPage() : null
-        ];
+        return parent::toArray($request);
     }
 }

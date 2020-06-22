@@ -8,8 +8,8 @@ use App\Http\Requests\Administration\Profiles\UpdateProfileRequest;
 use App\Http\Requests\Administration\Profiles\SearchProfileRequest;
 use App\Http\Requests\Administration\Profiles\UpdatePermissionsRequest;
 use App\Http\Resources\Administration\Profiles\PermissionGroupsCollection;
-use App\Http\Resources\Administration\Profiles\ProfileCollection;
 use App\Http\Resources\Administration\Profiles\ProfileResource;
+use App\Http\Resources\Administration\Profiles\ProfilesCollection;
 use App\Models\Administration\Permissions\PermissionGroup;
 
 use Illuminate\Http\Client\Response;
@@ -28,7 +28,7 @@ class ProfilesController extends Controller
      */
     public function index()
     {
-        return new ProfileCollection( Role::with('permissions')->paginate(5) );
+        return Role::with('permissions')->paginate(5);
     }
 
     /**
@@ -93,8 +93,7 @@ class ProfilesController extends Controller
 
     public function search(SearchProfileRequest $request)
     {
-        $roles = Role::where($request->searchFields)->get();
-        return new ProfileCollection($roles);
+        return Role::where($request->searchFields)->get();
     }
 
     public function permissionsGroups()

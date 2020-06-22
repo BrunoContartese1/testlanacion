@@ -39,6 +39,7 @@
                                                     <v-spacer></v-spacer>
                                                     <v-btn color="#dc3545" @click="askForDelete(sensor)"><strong class="text-">Eliminar Sensor</strong></v-btn>
                                                     <v-btn class="warning" @click="editSensor(sensor)">Editar Sensor</v-btn>
+                                                    <v-btn class="primary" @click="getNearestSensors(sensor)">Sensores cercanos</v-btn>
                                                 </v-card-actions>
 
                                             </v-card>
@@ -55,6 +56,7 @@
 
                         <edit-sensor-dialog v-if="updateDialog" v-on:close-dialog="updateDialog = false" @update-sensor="updateSensor" :selectedSensor="selectedSensor"></edit-sensor-dialog>
 
+                        <nearest-sensors-dialog v-if="nearestSensorsDialog" v-on:close-dialog="nearestSensorsDialog = false" :selectedSensor="selectedSensor"></nearest-sensors-dialog>
                 </v-card>
             </v-col>
         </v-row>
@@ -72,6 +74,7 @@ export default {
                 isLoading: true,
                 newDialog: false,
                 updateDialog: false,
+                nearestSensorsDialog: false,
                 sensors: {},
                 selectedSensor: {},
                 lastPage: 1,
@@ -279,6 +282,10 @@ export default {
                 me.isLoading = false
 
             });
+        },
+        getNearestSensors: function(sensor) {
+            this.selectedSensor = sensor
+            this.nearestSensorsDialog = true
         }
     },
     watch: {

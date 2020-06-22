@@ -49,6 +49,25 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public static $rules = [
+        'name' => 'required',
+        'username' => 'required|unique:users,username',
+        'email' => 'required|email',
+        'password' => 'required|min:8',
+        'repeat_password' => 'same:password'
+    ];
+
+    public static $messages = [
+        'name.required' => 'Debe ingresar el apellido y nombre del usuario.',
+        'username.required' => 'Debe ingresar el nombre de usuario con el que iniciará sesión',
+        'username.unique' => 'El nombre de usuario ingresado ya existe en nuestra base de datos.',
+        'email.required' => 'Debe ingresar la dirección de correo electrónico del usuario.',
+        'email.email' => 'La dirección de correo electrónico no es válida.',
+        'password.required' => 'Debe ingresar una contraseña y debe contener al menos 8 caracteres.',
+        'password.min' => 'La contraseña debe contener al menos :min caracteres.',
+        'repeat_password.same' => 'Las contraseñas no coinciden.'
+    ];
+
     public function findForPassport($username) {
         return $this->where('username', $username)->first();
     }

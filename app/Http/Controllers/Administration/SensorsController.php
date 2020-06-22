@@ -84,4 +84,11 @@ class SensorsController extends Controller
 
         return response()->json('Sensor eliminado con éxito.', 200);
     }
+
+    public function nearestSensors($sensor, $quantity)
+    {
+        $sensor = Sensor::findOrFail($sensor);
+
+        return $sensor->nearestSensors($quantity);
+    }
 }

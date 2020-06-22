@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::post('/login', 'AuthController@login')->name('login');
 
+
 Route::group(['middleware' => 'auth:api'], function() {
 
     Route::get('/user', function (Request $request) {
@@ -56,7 +57,7 @@ Route::group(['middleware' => 'auth:api'], function() {
                             Sensors Routes
         ========================================================*/
         Route::resource('sensors', 'Administration\SensorsController')->except(['create', 'edit']);
-
+        Route::get('sensors/{sensor}/nearestSensors/{quantity}', 'Administration\SensorsController@nearestSensors');
 
         /*=======================================================
                             End Sensors Routes

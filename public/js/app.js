@@ -2214,7 +2214,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       }).then(function (response) {
         me.profiles = response.data.data;
-        me.lastPage = response.data.lastPage;
+        me.lastPage = response.data.last_page;
       })["catch"](function (errors) {
         console.log(errors);
       });
@@ -2239,8 +2239,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: "Bearer " + localStorage.getItem('access_token')
         }
       }).then(function (response) {
-        me.profiles = response.data.data;
-        me.lastPage = response.data.lastPage;
+        me.profiles = response.data;
       })["catch"](function (res) {
         me.isLoading = false;
 
@@ -2731,6 +2730,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     this.getSensors();
@@ -2740,6 +2741,7 @@ __webpack_require__.r(__webpack_exports__);
       isLoading: true,
       newDialog: false,
       updateDialog: false,
+      nearestSensorsDialog: false,
       sensors: {},
       selectedSensor: {},
       lastPage: 1,
@@ -2912,12 +2914,148 @@ __webpack_require__.r(__webpack_exports__);
       })["finally"](function () {
         me.isLoading = false;
       });
+    },
+    getNearestSensors: function getNearestSensors(sensor) {
+      this.selectedSensor = sensor;
+      this.nearestSensorsDialog = true;
     }
   },
   watch: {
     currentPage: function currentPage(val) {
       this.isLoading = true;
       this.getSensors();
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['selectedSensor'],
+  mounted: function mounted() {
+    this.getNearestSensors();
+  },
+  data: function data() {
+    return {
+      dialog: true,
+      limitQuantity: "5",
+      isLoading: true,
+      nearestSensors: {}
+    };
+  },
+  methods: {
+    closeDialog: function closeDialog() {
+      this.$emit("close-dialog");
+    },
+    getNearestSensors: function getNearestSensors() {
+      var me = this;
+      var url = '/api/Administration/sensors/' + me.selectedSensor.id + '/nearestSensors/' + me.limitQuantity;
+      axios.get(url, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem('access_token')
+        }
+      }).then(function (response) {
+        me.nearestSensors = response.data;
+      })["catch"](function (res) {
+        switch (res.response.status) {
+          case 422:
+            me.$handleErrors(res.response.data.errors);
+            break;
+
+          case 404:
+            me.message('error', 'Oops! Ha ocurrido un error de sistema. (404)');
+            break;
+
+          case 401:
+            me.message('error', 'Usted no está autorizado a ver los sensores.');
+            break;
+
+          default:
+            me.message('error', 'Oops! Ha ocurrido un error de sistema. (' + res.response.status + ')');
+            break;
+        }
+      })["finally"](function () {
+        me.isLoading = false;
+      });
+    }
+  },
+  watch: {
+    limitQuantity: function limitQuantity(newVal) {
+      this.isLoading = true;
+      this.getNearestSensors();
     }
   }
 });
@@ -3053,9 +3191,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     userObject: {
@@ -3066,52 +3201,23 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     this.user = this.userObject;
     this.user.password_repeat = "";
+    this.user.profiles = {};
+    this.getProfiles();
   },
   data: function data() {
     return {
       user: {},
-      isLoading: false,
-      dialog: true
+      dialog: true,
+      showPassword: false,
+      profiles: {}
     };
   },
   methods: {
-    updateUser: function updateUser() {
-      var me = this;
-      me.isLoading = true;
-      axios.put('/api/Administration/Profiles/' + me.selectedProfile.id, {
-        name: me.selectedProfile.name
-      }, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem('access_token')
-        }
-      }).then(function () {
-        me.selectedProfile = {};
-        me.message('success', 'Perfil actualizado con éxito!');
-        me.getProfiles();
-      })["catch"](function (res) {
-        switch (res.response.status) {
-          case 422:
-            me.$handleErrors(res.response.data.errors);
-            break;
-
-          case 404:
-            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.');
-            break;
-
-          case 401:
-            me.message('error', 'Usted no está autorizado a crear perfiles.');
-            break;
-
-          default:
-            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.');
-            break;
-        }
-      })["finally"](function () {
-        me.isLoading = false;
-      });
-    },
     closeDialog: function closeDialog() {
       this.$emit('cancelUpdate');
+    },
+    updateUser: function updateUser() {
+      this.$emit('update-user', this.user);
     }
   }
 });
@@ -3208,6 +3314,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
@@ -3217,6 +3325,7 @@ __webpack_require__.r(__webpack_exports__);
     return {
       isLoading: true,
       updateDialog: false,
+      newDialog: false,
       users: {},
       selectedUser: {},
       lastPage: 1,
@@ -3235,7 +3344,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       }).then(function (response) {
         me.users = response.data.data;
-        me.lastPage = response.data.lastPage;
+        me.lastPage = response.data.last_page;
       })["catch"](function (res) {
         switch (res.response.status) {
           case 422:
@@ -3258,27 +3367,17 @@ __webpack_require__.r(__webpack_exports__);
         me.isLoading = false;
       });
     },
-    searchUsers: function searchUsers() {
+    storeUser: function storeUser(user) {
       var me = this;
-
-      if (this.searchFields.name !== '') {
-        me.search();
-      } else {
-        me.getProfiles();
-      }
-    },
-    search: function search() {
-      var me = this;
-      this.currentPage = 1;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/Administration/Profiles/Search', {
-        searchFields: me.searchFields
-      }, {
+      me.isLoading = true;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/Administration/users', user, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem('access_token')
         }
-      }).then(function (response) {
-        me.profiles = response.data.data;
-        me.lastPage = response.data.lastPage;
+      }).then(function () {
+        me.newDialog = false;
+        me.message('success', 'Usuario creado con éxito!');
+        me.getUsers();
       })["catch"](function (res) {
         switch (res.response.status) {
           case 422:
@@ -3286,34 +3385,38 @@ __webpack_require__.r(__webpack_exports__);
             break;
 
           case 404:
-            me.message('error', 'Oops! Ha ocurrido un error al buscar el perfil.');
+            me.message('error', 'Oops! Ha ocurrido un error al crear el usuario.');
             break;
 
           case 401:
-            me.message('error', 'Usted no está autorizado a ver perfiles.');
+            me.message('error', 'Usted no está autorizado a crear usuarios.');
             break;
 
           default:
-            me.message('error', 'Oops! Ha ocurrido un error al buscar el perfil.');
+            me.message('error', 'Oops! Ha ocurrido un error de sistema.');
             break;
         }
       })["finally"](function () {
         me.isLoading = false;
       });
     },
-    createUser: function createUser() {
+    updateUser: function updateUser(user) {
       var me = this;
       me.isLoading = true;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/Administration/Profiles', {
-        name: me.selectedProfile.name
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.put('/api/Administration/users/' + user.id, {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        password: user.password,
+        repeat_password: user.repeat_password
       }, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem('access_token')
         }
       }).then(function () {
-        me.selectedProfile = {};
-        me.getProfiles();
-        me.message('success', 'Perfil creado con éxito!');
+        me.updateDialog = false;
+        me.message('success', 'Usuario actualizado con éxito!');
+        me.getUsers();
       })["catch"](function (res) {
         switch (res.response.status) {
           case 422:
@@ -3321,22 +3424,22 @@ __webpack_require__.r(__webpack_exports__);
             break;
 
           case 404:
-            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.');
+            me.message('error', 'Oops! Ha ocurrido un error al actualizar el usuario.');
             break;
 
           case 401:
-            me.message('error', 'Usted no está autorizado a crear perfiles.');
+            me.message('error', 'Usted no está autorizado a actualizar usuarios.');
             break;
 
           default:
-            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.');
+            me.message('error', 'Oops! Ha ocurrido un error de sistema.');
             break;
         }
       })["finally"](function () {
         me.isLoading = false;
       });
     },
-    askForDelete: function askForDelete(profile) {
+    askForDelete: function askForDelete(user) {
       var me = this;
       var options = {
         okText: 'Aceptar',
@@ -3344,20 +3447,20 @@ __webpack_require__.r(__webpack_exports__);
         animation: 'zoom',
         clicksCount: 2
       };
-      this.$dialog.confirm('¿Está seguro de que desea eliminar el perfil?', options).then(function (dialog) {
-        me.deleteProfile(profile.id);
+      this.$dialog.confirm('¿Está seguro de que desea eliminar el usuario?', options).then(function (dialog) {
+        me.deleteUser(user.id);
       })["catch"](function () {});
     },
-    deleteProfile: function deleteProfile(profileId) {
+    deleteUser: function deleteUser(userId) {
       var me = this;
       me.isLoading = true;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a["delete"]('/api/Administration/Profiles/' + profileId, {
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a["delete"]('/api/Administration/users/' + userId, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem('access_token')
         }
       }).then(function () {
-        me.getProfiles();
-        me.message('success', 'Perfil eliminado con éxito!');
+        me.getUsers();
+        me.message('success', 'Usuario eliminado con éxito!');
       })["catch"](function (res) {
         me.isLoading = false;
 
@@ -3367,15 +3470,15 @@ __webpack_require__.r(__webpack_exports__);
             break;
 
           case 404:
-            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.');
+            me.message('error', 'Oops! Ha ocurrido un error al eliminar el usuario.');
             break;
 
           case 401:
-            me.message('error', 'Usted no está autorizado a crear perfiles.');
+            me.message('error', 'Usted no está autorizado a eliminar usuarios.');
             break;
 
           default:
-            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.');
+            me.message('error', 'Oops! Ha ocurrido un error de sistema.');
             break;
         }
       });
@@ -3390,7 +3493,6 @@ __webpack_require__.r(__webpack_exports__);
     editUser: function editUser(user) {
       this.selectedUser = user;
       this.updateDialog = true;
-      console.log(this.selectedUser);
     },
     cancelUpdate: function cancelUpdate() {
       this.updateDialog = false;
@@ -3400,6 +3502,91 @@ __webpack_require__.r(__webpack_exports__);
     currentPage: function currentPage(val) {
       this.isLoading = true;
       this.getProfiles();
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/users/newUserDialog.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/administration/users/newUserDialog.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      user: {
+        name: "",
+        username: "",
+        email: "",
+        password: "",
+        repeat_password: ""
+      },
+      dialog: true,
+      showPassword: false
+    };
+  },
+  methods: {
+    closeDialog: function closeDialog() {
+      this.$emit('closeDialog');
+    },
+    storeUser: function storeUser() {
+      this.$emit('store-user', this.user);
     }
   }
 });
@@ -61505,6 +61692,20 @@ var render = function() {
             "v-dialog",
             {
               attrs: { dark: true, persistent: "", "max-width": "600px" },
+              on: {
+                keydown: function($event) {
+                  if (
+                    !$event.type.indexOf("key") &&
+                    _vm._k($event.keyCode, "esc", 27, $event.key, [
+                      "Esc",
+                      "Escape"
+                    ])
+                  ) {
+                    return null
+                  }
+                  return _vm.closeDialog()
+                }
+              },
               model: {
                 value: _vm.dialog,
                 callback: function($$v) {
@@ -61825,6 +62026,21 @@ var render = function() {
                                                   }
                                                 },
                                                 [_vm._v("Editar Sensor")]
+                                              ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "v-btn",
+                                                {
+                                                  staticClass: "primary",
+                                                  on: {
+                                                    click: function($event) {
+                                                      return _vm.getNearestSensors(
+                                                        sensor
+                                                      )
+                                                    }
+                                                  }
+                                                },
+                                                [_vm._v("Sensores cercanos")]
                                               )
                                             ],
                                             1
@@ -61879,7 +62095,224 @@ var render = function() {
                           "update-sensor": _vm.updateSensor
                         }
                       })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.nearestSensorsDialog
+                    ? _c("nearest-sensors-dialog", {
+                        attrs: { selectedSensor: _vm.selectedSensor },
+                        on: {
+                          "close-dialog": function($event) {
+                            _vm.nearestSensorsDialog = false
+                          }
+                        }
+                      })
                     : _vm._e()
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=template&id=1bdfd21b&":
+/*!*****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=template&id=1bdfd21b& ***!
+  \*****************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c(
+        "v-overlay",
+        { attrs: { value: _vm.isLoading } },
+        [
+          _c("v-progress-circular", {
+            attrs: { indeterminate: "", size: "64" }
+          })
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-row",
+        { attrs: { justify: "center" } },
+        [
+          _c(
+            "v-dialog",
+            {
+              attrs: { dark: true, persistent: "", "max-width": "600px" },
+              on: {
+                keydown: function($event) {
+                  if (
+                    !$event.type.indexOf("key") &&
+                    _vm._k($event.keyCode, "esc", 27, $event.key, [
+                      "Esc",
+                      "Escape"
+                    ])
+                  ) {
+                    return null
+                  }
+                  return _vm.closeDialog()
+                }
+              },
+              model: {
+                value: _vm.dialog,
+                callback: function($$v) {
+                  _vm.dialog = $$v
+                },
+                expression: "dialog"
+              }
+            },
+            [
+              _c(
+                "v-card",
+                [
+                  _c(
+                    "v-card-title",
+                    [
+                      _c("span", { staticClass: "headline" }, [
+                        _vm._v("Sensores más cercanos")
+                      ]),
+                      _vm._v(" "),
+                      _c("v-spacer"),
+                      _vm._v(" "),
+                      _c(
+                        "v-radio-group",
+                        {
+                          model: {
+                            value: _vm.limitQuantity,
+                            callback: function($$v) {
+                              _vm.limitQuantity = $$v
+                            },
+                            expression: "limitQuantity"
+                          }
+                        },
+                        [
+                          _c("v-radio", {
+                            key: "5",
+                            attrs: { label: "Mostrar 5 registros", value: "5" }
+                          }),
+                          _vm._v(" "),
+                          _c("v-radio", {
+                            key: "10",
+                            attrs: {
+                              label: "Mostrar 10 registros",
+                              value: "10"
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c(
+                        "v-container",
+                        [
+                          _c(
+                            "v-row",
+                            { attrs: { "no-gutters": "" } },
+                            _vm._l(_vm.nearestSensors, function(sensor) {
+                              return _c(
+                                "v-card",
+                                {
+                                  key: sensor.id,
+                                  staticClass: "ma-3",
+                                  attrs: { raised: "", elevation: "24" }
+                                },
+                                [
+                                  _c("v-card-title", [
+                                    _vm._v(" " + _vm._s(sensor.name) + " ")
+                                  ]),
+                                  _vm._v(" "),
+                                  _c(
+                                    "v-card-text",
+                                    [
+                                      _c("v-col", [
+                                        _c("p", [
+                                          _c("strong", [
+                                            _vm._v(
+                                              "Ubicación (X, Y): (" +
+                                                _vm._s(sensor.x_pos) +
+                                                ", " +
+                                                _vm._s(sensor.y_pos) +
+                                                ")"
+                                            )
+                                          ])
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("p", [
+                                          _c("strong", [
+                                            _vm._v(
+                                              "Distancia (Unidades): " +
+                                                _vm._s(
+                                                  _vm._f("round")(
+                                                    sensor.distance
+                                                  )
+                                                )
+                                            )
+                                          ])
+                                        ])
+                                      ])
+                                    ],
+                                    1
+                                  )
+                                ],
+                                1
+                              )
+                            }),
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c("v-spacer"),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { color: "primary" },
+                          on: { click: _vm.closeDialog }
+                        },
+                        [_vm._v("Cerrar")]
+                      )
+                    ],
+                    1
+                  )
                 ],
                 1
               )
@@ -61926,6 +62359,20 @@ var render = function() {
             "v-dialog",
             {
               attrs: { dark: true, persistent: "", "max-width": "600px" },
+              on: {
+                keydown: function($event) {
+                  if (
+                    !$event.type.indexOf("key") &&
+                    _vm._k($event.keyCode, "esc", 27, $event.key, [
+                      "Esc",
+                      "Escape"
+                    ])
+                  ) {
+                    return null
+                  }
+                  return _vm.closeDialog()
+                }
+              },
               model: {
                 value: _vm.dialog,
                 callback: function($$v) {
@@ -62100,11 +62547,20 @@ var render = function() {
           _c(
             "v-dialog",
             {
-              attrs: {
-                dark: true,
-                fullscreen: "",
-                persistent: "",
-                "max-width": "600px"
+              attrs: { dark: true, persistent: "", "max-width": "600px" },
+              on: {
+                keydown: function($event) {
+                  if (
+                    !$event.type.indexOf("key") &&
+                    _vm._k($event.keyCode, "esc", 27, $event.key, [
+                      "Esc",
+                      "Escape"
+                    ])
+                  ) {
+                    return null
+                  }
+                  return _vm.closeDialog()
+                }
               },
               model: {
                 value: _vm.dialog,
@@ -62199,8 +62655,21 @@ var render = function() {
                                 [
                                   _c("v-text-field", {
                                     attrs: {
+                                      "append-icon": _vm.showPassword
+                                        ? "mdi-eye"
+                                        : "mdi-eye-off",
+                                      type: _vm.showPassword
+                                        ? "text"
+                                        : "password",
+                                      hint: "Al menos 8 caracteres",
+                                      counter: "",
                                       label: "Contraseña*",
                                       required: ""
+                                    },
+                                    on: {
+                                      "click:append": function($event) {
+                                        _vm.showPassword = !_vm.showPassword
+                                      }
                                     },
                                     model: {
                                       value: _vm.user.password,
@@ -62220,8 +62689,21 @@ var render = function() {
                                 [
                                   _c("v-text-field", {
                                     attrs: {
+                                      "append-icon": _vm.showPassword
+                                        ? "mdi-eye"
+                                        : "mdi-eye-off",
+                                      type: _vm.showPassword
+                                        ? "text"
+                                        : "password",
+                                      hint: "Al menos 8 caracteres",
+                                      counter: "",
                                       label: "Repita la contraseña*",
                                       required: ""
+                                    },
+                                    on: {
+                                      "click:append": function($event) {
+                                        _vm.showPassword = !_vm.showPassword
+                                      }
                                     },
                                     model: {
                                       value: _vm.user.repeat_password,
@@ -62233,30 +62715,6 @@ var render = function() {
                                         )
                                       },
                                       expression: "user.repeat_password"
-                                    }
-                                  })
-                                ],
-                                1
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "v-col",
-                                { attrs: { cols: "12" } },
-                                [
-                                  _c("v-select", {
-                                    attrs: {
-                                      items: _vm.items,
-                                      attach: "",
-                                      chips: "",
-                                      label: "Perfiles",
-                                      multiple: ""
-                                    },
-                                    model: {
-                                      value: _vm.value,
-                                      callback: function($$v) {
-                                        _vm.value = $$v
-                                      },
-                                      expression: "value"
                                     }
                                   })
                                 ],
@@ -62378,8 +62836,21 @@ var render = function() {
                       _vm._v(" "),
                       _c(
                         "v-btn",
-                        { attrs: { icon: "" } },
-                        [_c("v-icon", [_vm._v("mdi-magnify")])],
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: { color: "primary" },
+                              on: {
+                                click: function($event) {
+                                  _vm.newDialog = true
+                                }
+                              }
+                            },
+                            [_c("v-icon", [_vm._v("mdi-plus")])],
+                            1
+                          )
+                        ],
                         1
                       )
                     ],
@@ -62578,10 +63049,283 @@ var render = function() {
             on: {
               cancelUpdate: function($event) {
                 return _vm.cancelUpdate()
-              }
+              },
+              "update-user": _vm.updateUser
+            }
+          })
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.newDialog
+        ? _c("new-user-dialog", {
+            on: {
+              closeDialog: function($event) {
+                _vm.newDialog = false
+              },
+              "store-user": _vm.storeUser
             }
           })
         : _vm._e()
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/users/newUserDialog.vue?vue&type=template&id=764acb7a&":
+/*!********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/administration/users/newUserDialog.vue?vue&type=template&id=764acb7a& ***!
+  \********************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _c(
+        "v-row",
+        { attrs: { justify: "center" } },
+        [
+          _c(
+            "v-dialog",
+            {
+              attrs: { dark: true, persistent: "", "max-width": "600px" },
+              on: {
+                keydown: function($event) {
+                  if (
+                    !$event.type.indexOf("key") &&
+                    _vm._k($event.keyCode, "esc", 27, $event.key, [
+                      "Esc",
+                      "Escape"
+                    ])
+                  ) {
+                    return null
+                  }
+                  return _vm.closeDialog()
+                }
+              },
+              model: {
+                value: _vm.dialog,
+                callback: function($$v) {
+                  _vm.dialog = $$v
+                },
+                expression: "dialog"
+              }
+            },
+            [
+              _c(
+                "v-card",
+                [
+                  _c("v-card-title", [
+                    _c("span", { staticClass: "headline" }, [
+                      _vm._v("Nuevo Usuario")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-text",
+                    [
+                      _c(
+                        "v-container",
+                        [
+                          _c(
+                            "v-row",
+                            [
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: {
+                                      label: "Apellido y Nombre*",
+                                      required: ""
+                                    },
+                                    model: {
+                                      value: _vm.user.name,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.user, "name", $$v)
+                                      },
+                                      expression: "user.name"
+                                    }
+                                  })
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: {
+                                      label: "Nombre de Usuario*",
+                                      required: ""
+                                    },
+                                    model: {
+                                      value: _vm.user.username,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.user, "username", $$v)
+                                      },
+                                      expression: "user.username"
+                                    }
+                                  })
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: { label: "Email*", required: "" },
+                                    model: {
+                                      value: _vm.user.email,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.user, "email", $$v)
+                                      },
+                                      expression: "user.email"
+                                    }
+                                  })
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: {
+                                      "append-icon": _vm.showPassword
+                                        ? "mdi-eye"
+                                        : "mdi-eye-off",
+                                      type: _vm.showPassword
+                                        ? "text"
+                                        : "password",
+                                      hint: "Al menos 8 caracteres",
+                                      counter: "",
+                                      label: "Contraseña*",
+                                      required: ""
+                                    },
+                                    on: {
+                                      "click:append": function($event) {
+                                        _vm.showPassword = !_vm.showPassword
+                                      }
+                                    },
+                                    model: {
+                                      value: _vm.user.password,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.user, "password", $$v)
+                                      },
+                                      expression: "user.password"
+                                    }
+                                  })
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-col",
+                                { attrs: { cols: "12" } },
+                                [
+                                  _c("v-text-field", {
+                                    attrs: {
+                                      "append-icon": _vm.showPassword
+                                        ? "mdi-eye"
+                                        : "mdi-eye-off",
+                                      type: _vm.showPassword
+                                        ? "text"
+                                        : "password",
+                                      hint: "Al menos 8 caracteres",
+                                      counter: "",
+                                      label: "Repita la contraseña*",
+                                      required: ""
+                                    },
+                                    on: {
+                                      "click:append": function($event) {
+                                        _vm.showPassword = !_vm.showPassword
+                                      }
+                                    },
+                                    model: {
+                                      value: _vm.user.repeat_password,
+                                      callback: function($$v) {
+                                        _vm.$set(
+                                          _vm.user,
+                                          "repeat_password",
+                                          $$v
+                                        )
+                                      },
+                                      expression: "user.repeat_password"
+                                    }
+                                  })
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-card-actions",
+                    [
+                      _c("v-spacer"),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { color: "success" },
+                          on: {
+                            click: function($event) {
+                              return _vm.closeDialog()
+                            }
+                          }
+                        },
+                        [_vm._v("Cancelar")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-btn",
+                        {
+                          attrs: { color: "warning" },
+                          on: {
+                            click: function($event) {
+                              return _vm.storeUser()
+                            }
+                          }
+                        },
+                        [_vm._v("Crear")]
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
     ],
     1
   )
@@ -121035,9 +121779,11 @@ var map = {
 	"./views/administration/profiles/permissions.vue": "./resources/js/views/administration/profiles/permissions.vue",
 	"./views/administration/sensors/editSensorDialog.vue": "./resources/js/views/administration/sensors/editSensorDialog.vue",
 	"./views/administration/sensors/index.vue": "./resources/js/views/administration/sensors/index.vue",
+	"./views/administration/sensors/nearestSensorsDialog.vue": "./resources/js/views/administration/sensors/nearestSensorsDialog.vue",
 	"./views/administration/sensors/newSensorDialog.vue": "./resources/js/views/administration/sensors/newSensorDialog.vue",
 	"./views/administration/users/editUserDialog.vue": "./resources/js/views/administration/users/editUserDialog.vue",
 	"./views/administration/users/index.vue": "./resources/js/views/administration/users/index.vue",
+	"./views/administration/users/newUserDialog.vue": "./resources/js/views/administration/users/newUserDialog.vue",
 	"./views/auth/login.vue": "./resources/js/views/auth/login.vue",
 	"./views/auth/logout.vue": "./resources/js/views/auth/logout.vue",
 	"./views/errors/notFound.vue": "./resources/js/views/errors/notFound.vue",
@@ -121153,6 +121899,16 @@ Vue.filter('formatDate', function (value) {
   if (value) {
     return moment__WEBPACK_IMPORTED_MODULE_3___default()(String(value)).format('DD/MM/YYYY hh:mm');
   }
+});
+/*Decimales*/
+
+Vue.filter('round', function (value) {
+  if (!value) {
+    value = 0;
+  }
+
+  value = Math.round(value * Math.pow(10, 2)) / Math.pow(10, 2);
+  return value;
 });
 /*========================================================
                     Fin Filtros
@@ -121992,6 +122748,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/views/administration/sensors/nearestSensorsDialog.vue":
+/*!****************************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/nearestSensorsDialog.vue ***!
+  \****************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _nearestSensorsDialog_vue_vue_type_template_id_1bdfd21b___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./nearestSensorsDialog.vue?vue&type=template&id=1bdfd21b& */ "./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=template&id=1bdfd21b&");
+/* harmony import */ var _nearestSensorsDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./nearestSensorsDialog.vue?vue&type=script&lang=js& */ "./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _nearestSensorsDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _nearestSensorsDialog_vue_vue_type_template_id_1bdfd21b___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _nearestSensorsDialog_vue_vue_type_template_id_1bdfd21b___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/views/administration/sensors/nearestSensorsDialog.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_nearestSensorsDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./nearestSensorsDialog.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_nearestSensorsDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=template&id=1bdfd21b&":
+/*!***********************************************************************************************************!*\
+  !*** ./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=template&id=1bdfd21b& ***!
+  \***********************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_nearestSensorsDialog_vue_vue_type_template_id_1bdfd21b___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./nearestSensorsDialog.vue?vue&type=template&id=1bdfd21b& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/sensors/nearestSensorsDialog.vue?vue&type=template&id=1bdfd21b&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_nearestSensorsDialog_vue_vue_type_template_id_1bdfd21b___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_nearestSensorsDialog_vue_vue_type_template_id_1bdfd21b___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/views/administration/sensors/newSensorDialog.vue":
 /*!***********************************************************************!*\
   !*** ./resources/js/views/administration/sensors/newSensorDialog.vue ***!
@@ -122194,6 +123019,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_59fd45ce___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_59fd45ce___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/users/newUserDialog.vue":
+/*!*******************************************************************!*\
+  !*** ./resources/js/views/administration/users/newUserDialog.vue ***!
+  \*******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _newUserDialog_vue_vue_type_template_id_764acb7a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./newUserDialog.vue?vue&type=template&id=764acb7a& */ "./resources/js/views/administration/users/newUserDialog.vue?vue&type=template&id=764acb7a&");
+/* harmony import */ var _newUserDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./newUserDialog.vue?vue&type=script&lang=js& */ "./resources/js/views/administration/users/newUserDialog.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _newUserDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _newUserDialog_vue_vue_type_template_id_764acb7a___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _newUserDialog_vue_vue_type_template_id_764acb7a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/views/administration/users/newUserDialog.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/users/newUserDialog.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************!*\
+  !*** ./resources/js/views/administration/users/newUserDialog.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_newUserDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./newUserDialog.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/users/newUserDialog.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_newUserDialog_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/views/administration/users/newUserDialog.vue?vue&type=template&id=764acb7a&":
+/*!**************************************************************************************************!*\
+  !*** ./resources/js/views/administration/users/newUserDialog.vue?vue&type=template&id=764acb7a& ***!
+  \**************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_newUserDialog_vue_vue_type_template_id_764acb7a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./newUserDialog.vue?vue&type=template&id=764acb7a& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/administration/users/newUserDialog.vue?vue&type=template&id=764acb7a&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_newUserDialog_vue_vue_type_template_id_764acb7a___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_newUserDialog_vue_vue_type_template_id_764acb7a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

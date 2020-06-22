@@ -28,5 +28,16 @@ class UsersTableSeeder extends Seeder
         $role->syncPermissions(Permission::all());
 
         $user->syncRoles("Administrador");
+
+        $user =  User::create([
+            'name' => 'Demo, Demo',
+            'username' => 'demo',
+            'email' => 'demo@demo.com.ar',
+            'password' => bcrypt('demo')
+        ]);
+
+        $user->syncRoles("Administrador");
+
+
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Administration\Users;
 
+use App\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateUserRequest extends FormRequest
@@ -13,7 +14,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return auth()->user()->hasPermissionTo("administration.users.edit");
     }
 
     /**
@@ -23,8 +24,20 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
-        ];
+        $rules = User::$rules;
+
+        $rules['username'] = 'required|unique:users,username,' . $this->route()->parameter('user');
+
+        return $rules;
+    }
+
+    /**
+     * Get the validation messages that apply to the request.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return User::$messages;
     }
 }

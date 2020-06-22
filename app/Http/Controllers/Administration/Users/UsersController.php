@@ -24,7 +24,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        return new UserCollection( User::with('roles')->paginate(5) );
+        return User::with('roles')->paginate(5);
     }
 
     /**
@@ -35,8 +35,11 @@ class UsersController extends Controller
      */
     public function store(CreateUserRequest $request)
     {
-        $user = User::create($request);
-        $user->syncRoles($request->roles);
+        $input = $request->all();
+
+        $input['password'] = bcrypt($input['password']);
+        $user = User::create($input);
+        //$user->syncRoles($request->roles);
         return response()->json('Usuario creado con éxito.', 200);
     }
 
@@ -75,9 +78,15 @@ class UsersController extends Controller
             return response()->json('Usuario no encontrado.', 404);
         }
 
-        $user->update($request);
+        $data = $request->all();
 
-        $user->syncRoles($request->roles);
+        $data['password'] = bcrypt($data['password']);
+
+        $user->update($data);
+
+        //$user->syncRoles($request->roles);
+
+        return response()->json("Usuario actualizado con éxito.", 200);
     }
 
     /**

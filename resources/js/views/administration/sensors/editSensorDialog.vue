@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-row justify="center">
-            <v-dialog v-model="dialog" :dark="true" persistent max-width="600px">
+            <v-dialog v-model="dialog" :dark="true" persistent max-width="600px" @keydown.esc="closeDialog()">
 
                 <v-card>
                     <v-card-title>

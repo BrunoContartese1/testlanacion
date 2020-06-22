@@ -13,9 +13,10 @@
 
                         <v-spacer></v-spacer>
 
-                        <v-btn icon>
-                            <v-icon>mdi-magnify</v-icon>
+                        <v-btn>
+                            <v-btn color="primary" @click="newDialog = true"><v-icon>mdi-plus</v-icon></v-btn>
                         </v-btn>
+
                     </v-toolbar>
 
                         <v-card-text>
@@ -71,7 +72,8 @@
 
         <!-- Dialog for updating the user"-->
 
-        <edit-user-dialog v-if="updateDialog" v-bind:userObject="selectedUser" v-on:cancelUpdate="cancelUpdate()"></edit-user-dialog>
+        <edit-user-dialog v-if="updateDialog" v-bind:userObject="selectedUser" v-on:cancelUpdate="cancelUpdate()"@update-user="updateUser"></edit-user-dialog>
+        <new-user-dialog v-if="newDialog" v-on:closeDialog="newDialog = false" @store-user="storeUser"></new-user-dialog>
 
     </div>
 
@@ -89,6 +91,7 @@
             return {
                 isLoading: true,
                 updateDialog: false,
+                newDialog: false,
                 users: {},
                 selectedUser: {},
                 lastPage: 1,
@@ -112,7 +115,7 @@
                 .then(function(response) {
 
                     me.users = response.data.data
-                    me.lastPage = response.data.lastPage;
+                    me.lastPage = response.data.last_page;
 
                 }).catch(function (res) {
 
@@ -140,73 +143,20 @@
 
 
             },
-            searchUsers: function() {
-                let me = this
-                if(this.searchFields.name !== '') {
-                    me.search()
-                } else {
-                    me.getProfiles()
-                }
-            },
-            search: function() {
-
-                let me = this
-                this.currentPage = 1
-                axios.post('/api/Administration/Profiles/Search', {
-                        searchFields: me.searchFields
-                    },
-                    {
-                        headers: {
-                            Authorization: "Bearer " + localStorage.getItem('access_token')
-                        }
-                    })
-                    .then(function(response) {
-
-                        me.profiles = response.data.data
-                        me.lastPage = response.data.lastPage;
-
-                    })
-                    .catch(function (res) {
-
-                        switch(res.response.status) {
-                            case 422:
-                                me.$handleErrors(res.response.data.errors)
-                                break
-                            case 404:
-                                me.message('error', 'Oops! Ha ocurrido un error al buscar el perfil.')
-                                break
-                            case 401:
-                                me.message('error', 'Usted no está autorizado a ver perfiles.')
-                                break
-                            default:
-                                me.message('error', 'Oops! Ha ocurrido un error al buscar el perfil.')
-                                break
-                        }
-
-                    })
-                    .finally(function() {
-                        me.isLoading = false
-                    });
-
-            },
-            createUser: function() {
+            storeUser: function(user) {
                 let me = this
 
                 me.isLoading = true
 
-                axios.post('/api/Administration/Profiles', {
-                    name: me.selectedProfile.name,
-                }, {
+                axios.post('/api/Administration/users', user, {
                     headers: {
                         Authorization: "Bearer " + localStorage.getItem('access_token')
                     }
                 })
                 .then(function() {
-                    me.selectedProfile = {}
-
-                    me.getProfiles()
-
-                    me.message('success', 'Perfil creado con éxito!')
+                    me.newDialog = false
+                    me.message('success', 'Usuario creado con éxito!')
+                    me.getUsers();
 
                 }).catch(function(res) {
 
@@ -215,13 +165,13 @@
                             me.$handleErrors(res.response.data.errors)
                             break
                         case 404:
-                            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.')
+                            me.message('error', 'Oops! Ha ocurrido un error al crear el usuario.')
                             break
                         case 401:
-                            me.message('error', 'Usted no está autorizado a crear perfiles.')
+                            me.message('error', 'Usted no está autorizado a crear usuarios.')
                             break
                         default:
-                            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.')
+                            me.message('error', 'Oops! Ha ocurrido un error de sistema.')
                             break
                     }
                 })
@@ -229,7 +179,52 @@
                     me.isLoading = false
                 });
             },
-            askForDelete: function(profile) {
+            updateUser: function(user) {
+                let me = this
+
+                me.isLoading = true
+
+                axios.put('/api/Administration/users/' + user.id, {
+                    name: user.name,
+                    username: user.username,
+                    email: user.email,
+                    password: user.password,
+                    repeat_password: user.repeat_password,
+                }, {
+                    headers: {
+                        Authorization: "Bearer " + localStorage.getItem('access_token')
+                    }
+                })
+                .then(function() {
+
+                    me.updateDialog = false
+                    me.message('success', 'Usuario actualizado con éxito!')
+                    me.getUsers();
+
+                }).catch(function(res) {
+
+                    switch(res.response.status) {
+                        case 422:
+                            me.$handleErrors(res.response.data.errors)
+                            break
+                        case 404:
+                            me.message('error', 'Oops! Ha ocurrido un error al actualizar el usuario.')
+                            break
+                        case 401:
+                            me.message('error', 'Usted no está autorizado a actualizar usuarios.')
+                            break
+                        default:
+                            me.message('error', 'Oops! Ha ocurrido un error de sistema.')
+                            break
+                    }
+
+                })
+                .finally(function() {
+                    me.isLoading = false
+                });
+
+            },
+            askForDelete: function(user) {
                 let me = this
                 let options = {
                     okText: 'Aceptar',
@@ -239,29 +234,29 @@
                 }
 
                 this.$dialog
-                    .confirm('¿Está seguro de que desea eliminar el perfil?', options)
+                    .confirm('¿Está seguro de que desea eliminar el usuario?', options)
                     .then(function(dialog) {
-                         me.deleteProfile(profile.id)
+                         me.deleteUser(user.id)
                     })
                     .catch(function() {
 
                     });
             },
-            deleteProfile: function(profileId) {
+            deleteUser: function(userId) {
                 let me = this
 
                 me.isLoading = true
 
-                axios.delete('/api/Administration/Profiles/' + profileId, {
+                axios.delete('/api/Administration/users/' + userId, {
                     headers: {
                         Authorization: "Bearer " + localStorage.getItem('access_token')
                     }
                 })
                 .then(function() {
 
-                    me.getProfiles()
+                    me.getUsers()
 
-                    me.message('success', 'Perfil eliminado con éxito!')
+                    me.message('success', 'Usuario eliminado con éxito!')
 
                 }).catch(function(res) {
 
@@ -272,13 +267,13 @@
                             me.$handleErrors(res.response.data.errors)
                             break
                         case 404:
-                            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.')
+                            me.message('error', 'Oops! Ha ocurrido un error al eliminar el usuario.')
                             break
                         case 401:
-                            me.message('error', 'Usted no está autorizado a crear perfiles.')
+                            me.message('error', 'Usted no está autorizado a eliminar usuarios.')
                             break
                         default:
-                            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.')
+                            me.message('error', 'Oops! Ha ocurrido un error de sistema.')
                             break
                     }
 
@@ -295,8 +290,6 @@
                 this.selectedUser = user
 
                 this.updateDialog = true
-
-                console.log(this.selectedUser)
             },
             cancelUpdate: function() {
                 this.updateDialog = false

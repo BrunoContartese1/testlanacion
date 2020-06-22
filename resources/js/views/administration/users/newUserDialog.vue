@@ -5,7 +5,7 @@
 
                 <v-card>
                     <v-card-title>
-                        <span class="headline">Editar Usuario</span>
+                        <span class="headline">Nuevo Usuario</span>
                     </v-card-title>
 
                     <v-card-text>
@@ -32,13 +32,15 @@
                                     <v-text-field @click:append="showPassword = !showPassword" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :type="showPassword ? 'text' : 'password'" hint="Al menos 8 caracteres" counter label="Repita la contraseña*" required v-model="user.repeat_password"></v-text-field>
                                 </v-col>
 
+
+
                             </v-row>
                         </v-container>
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="success" @click="closeDialog()">Cancelar</v-btn>
-                        <v-btn color="warning" @click="updateUser()">Actualizar</v-btn>
+                        <v-btn color="warning" @click="storeUser()">Crear</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>
@@ -48,35 +50,26 @@
 
 <script>
 export default {
-    props: {
-        userObject: {
-            type: Object,
-            required: true
-        }
-    },
-    mounted() {
-        this.user = this.userObject
-        this.user.password_repeat = ""
-        this.user.profiles = {}
-        this.getProfiles()
-
-
-    },
     data: () =>  {
         return {
-            user: {},
+            user: {
+                name: "",
+                username: "",
+                email: "",
+                password: "",
+                repeat_password: ""
+            },
             dialog: true,
-            showPassword: false,
-            profiles: {}
+            showPassword: false
         }
     },
     methods: {
         closeDialog: function() {
-            this.$emit('cancelUpdate')
+            this.$emit('closeDialog')
         },
-        updateUser: function() {
-            this.$emit('update-user', this.user)
-        },
+        storeUser: function() {
+            this.$emit('store-user', this.user)
+        }
     }
 }
 </script>

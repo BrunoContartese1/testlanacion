@@ -132,7 +132,7 @@
                 .then(function(response) {
 
                     me.profiles = response.data.data
-                    me.lastPage = response.data.lastPage;
+                    me.lastPage = response.data.last_page;
 
                 }).catch(function (errors) {
 
@@ -164,8 +164,8 @@
                 })
                     .then(function(response) {
 
-                        me.profiles = response.data.data
-                        me.lastPage = response.data.lastPage;
+                        me.profiles = response.data
+
 
                     }).catch(function (res) {
 
