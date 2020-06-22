@@ -18,10 +18,6 @@ Route::post('/login', 'AuthController@login')->name('login');
 
 Route::group(['middleware' => 'auth:api'], function() {
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-
     /*=======================================================
                         LOGIN ROUTES
     ========================================================*/
