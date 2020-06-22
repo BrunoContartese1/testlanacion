@@ -155,7 +155,7 @@ export default {
                     case 404:
                         me.message('error', 'Oops! Ha ocurrido un error al actualizar los permisos.')
                         break
-                    case 401:
+                    case 403:
                         me.message('error', 'Usted no está autorizado a actualizar los permisos.')
                         break
                     default:

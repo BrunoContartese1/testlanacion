@@ -58,7 +58,6 @@ export default {
         this.user = this.userObject
         this.user.password_repeat = ""
         this.user.profiles = {}
-        this.getProfiles()
 
 
     },
