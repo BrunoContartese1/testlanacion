@@ -31,3 +31,6 @@ Este último comando nos dará la key para poder configurar Laravel passport y p
 Se debe copiar el CLIENT SECRET del CLIENT ID Nº 2 (password grant client) en el archivo .env en la lnea que dice "PASSPORT_CLIENT_SECRET"
 
 La línea debera quedar algo parecido a <b>PASSPORT_CLIENT_SECRET=ivcwDbdVmhD6CFHQ7SgOZSL4D2DXbFdTebkjpp9E</b>
+
+Una vez realizados estos pasos debera poder entrar a la aplicación logueandose con el usuario y contraseña por defecto que es
+> Usuario: demo    Contraseña: demo
