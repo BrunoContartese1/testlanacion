@@ -19,10 +19,15 @@ Copiar el archivo .env.example y modificar las siguientes líneas
 APP_URL=http://localhost <-- URL donde correrá la aplicación. Es importante que la coloque bien ya que la ruta de autenticación depende de esta línea.
 
 DB_CONNECTION=mysql
+
 DB_HOST=127.0.0.1 <-- IP de su base de datos
+
 DB_PORT=3306 <-- Puerto
+
 DB_DATABASE=laravel <-- Nombre de su base de datos
+
 DB_USERNAME=root <-- Usuario 
+
 DB_PASSWORD= <-- Contraseña
 
 Correr los siguientes comandos
