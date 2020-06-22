@@ -32,6 +32,7 @@ Route::group(['middleware' => 'auth:api'], function() {
         Route::resource('Profiles', 'Administration\Profiles\ProfilesController')->except(['create', 'edit']);
         Route::post('Profiles/Search', 'Administration\Profiles\ProfilesController@search');
         Route::get('profiles/permissionGroups', 'Administration\Profiles\ProfilesController@permissionsGroups');
+
         Route::post('profiles/{profile}/updatePermissions', 'Administration\Profiles\ProfilesController@updatePermissions');
 
         /*=======================================================

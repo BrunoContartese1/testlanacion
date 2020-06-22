@@ -117,4 +117,5 @@ class ProfilesController extends Controller
 
         return response()->json('Permisos actualizados con éxito', 200);
     }
+
 }

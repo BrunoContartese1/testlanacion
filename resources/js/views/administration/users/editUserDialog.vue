@@ -57,9 +57,7 @@ export default {
     mounted() {
         this.user = this.userObject
         this.user.password_repeat = ""
-        this.user.profiles = {}
-
-
+        this.user.profiles = []
     },
     data: () =>  {
         return {
