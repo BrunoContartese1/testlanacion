@@ -101,8 +101,14 @@ class UsersController extends Controller
             return response()->json('Usuario no encontrado.', 404);
         }
 
-        $user->delete();
+        if(auth()->user()->hasPermissionTo("administration.users.delete")) {
+            $user->delete();
 
-        return response()->json("Usuario eliminado con éxito.", 200);
+            return response()->json("Usuario eliminado con éxito.", 200);
+        }
+
+        return response()->json("No tiene permisos para eliminar usuarios.", 403);
+
+
     }
 }

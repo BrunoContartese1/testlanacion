@@ -85,9 +85,15 @@ class ProfilesController extends Controller
             return response()->json(['errors' => ['Perfil no encontrado']], 404);
         }
 
-        $role->delete();
+        if(auth()->user()->hasPermissionTo("administration.profiles.delete")) {
+            $role->delete();
 
-        return response()->json("Perfil eliminado con éxito.", 200);
+            return response()->json("Perfil eliminado con éxito.", 200);
+        }
+
+        return response()->json("No tiene permisos para eliminar perfiles", 403);
+
+
 
     }
 

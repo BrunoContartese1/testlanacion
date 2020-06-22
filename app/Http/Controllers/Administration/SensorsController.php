@@ -80,9 +80,14 @@ class SensorsController extends Controller
     {
         $sensor = Sensor::findOrFail($id);
 
-        $sensor->delete();
+        if(auth()->user()->hasPermissionTo("administration.sensors.delete")) {
+            $sensor->delete();
 
-        return response()->json('Sensor eliminado con éxito.', 200);
+            return response()->json('Sensor eliminado con éxito.', 200);
+        }
+
+        return response()->json('No tiene permisos para eliminar sensores.', 403);
+
     }
 
     public function nearestSensors($sensor, $quantity)
