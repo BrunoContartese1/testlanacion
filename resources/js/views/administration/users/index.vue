@@ -167,7 +167,7 @@
                         case 404:
                             me.message('error', 'Oops! Ha ocurrido un error al crear el usuario.')
                             break
-                        case 401:
+                        case 403:
                             me.message('error', 'Usted no está autorizado a crear usuarios.')
                             break
                         default:
@@ -210,7 +210,7 @@
                         case 404:
                             me.message('error', 'Oops! Ha ocurrido un error al actualizar el usuario.')
                             break
-                        case 401:
+                        case 403:
                             me.message('error', 'Usted no está autorizado a actualizar usuarios.')
                             break
                         default:
@@ -269,7 +269,7 @@
                         case 404:
                             me.message('error', 'Oops! Ha ocurrido un error al eliminar el usuario.')
                             break
-                        case 401:
+                        case 403:
                             me.message('error', 'Usted no está autorizado a eliminar usuarios.')
                             break
                         default:

@@ -178,7 +178,7 @@
                             case 404:
                                 me.message('error', 'Oops! Ha ocurrido un error al buscar el perfil.')
                                 break
-                            case 401:
+                            case 403:
                                 me.message('error', 'Usted no está autorizado a ver perfiles.')
                                 break
                             default:
@@ -230,13 +230,13 @@
                             me.$handleErrors(res.response.data.errors)
                             break
                         case 404:
-                            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.')
+                            me.message('error', 'Oops! Ha ocurrido un error al actualizar el perfil.')
                             break
-                        case 401:
-                            me.message('error', 'Usted no está autorizado a crear perfiles.')
+                        case 403:
+                            me.message('error', 'Usted no está autorizado a actualizar perfiles.')
                             break
                         default:
-                            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.')
+                            me.message('error', 'Oops! Ha ocurrido un error al actualizar el perfil.')
                             break
                     }
 
@@ -275,7 +275,7 @@
                         case 404:
                             me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.')
                             break
-                        case 401:
+                        case 403:
                             me.message('error', 'Usted no está autorizado a crear perfiles.')
                             break
                         default:
@@ -329,13 +329,13 @@
                             me.$handleErrors(res.response.data.errors)
                             break
                         case 404:
-                            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.')
+                            me.message('error', 'Oops! Ha ocurrido un error al eliminar el perfil.')
                             break
-                        case 401:
-                            me.message('error', 'Usted no está autorizado a crear perfiles.')
+                        case 403:
+                            me.message('error', 'Usted no está autorizado a eliminar perfiles.')
                             break
                         default:
-                            me.message('error', 'Oops! Ha ocurrido un error al crear el perfil.')
+                            me.message('error', 'Oops! Ha ocurrido un error al eliminar el perfil.')
                             break
                     }
 

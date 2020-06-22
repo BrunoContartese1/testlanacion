@@ -27,6 +27,10 @@ class UsersTableSeeder extends Seeder
 
         $role->syncPermissions(Permission::all());
 
+        $role = Role::create([
+            'name' => 'Visitante'
+        ]);
+
         $user->syncRoles("Administrador");
 
         $user =  User::create([
@@ -36,7 +40,7 @@ class UsersTableSeeder extends Seeder
             'password' => bcrypt('demo')
         ]);
 
-        $user->syncRoles("Administrador");
+        $user->syncRoles("Visitante");
 
 
     }

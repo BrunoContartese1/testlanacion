@@ -109,7 +109,7 @@ export default {
                     case 404:
                         me.message('error', 'Oops! Ha ocurrido un error de sistema. (404)')
                         break
-                    case 401:
+                    case 403:
                         me.message('error', 'Usted no está autorizado a ver los sensores.')
                         break
                     default:
@@ -177,7 +177,7 @@ export default {
                     case 404:
                         me.message('error', 'Oops! Ha ocurrido un error al crear el sensor.')
                         break
-                    case 401:
+                    case 403:
                         me.message('error', 'Usted no está autorizado a eliminar sensores.')
                         break
                     default:
@@ -217,7 +217,7 @@ export default {
                     case 404:
                         me.message('error', 'Oops! Ha ocurrido un error de sistema. (404)')
                         break
-                    case 401:
+                    case 403:
                         me.message('error', 'Usted no está autorizado a crear sensores.')
                         break
                     default:
@@ -268,7 +268,7 @@ export default {
                     case 404:
                         me.message('error', 'Oops! Ha ocurrido un error de sistema. (404)')
                         break
-                    case 401:
+                    case 403:
                         me.message('error', 'Usted no está autorizado a actualizar sensores.')
                         break
                     default:
